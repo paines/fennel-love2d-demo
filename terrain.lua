@@ -11,7 +11,7 @@ local function posmod(a, n)
     return ((a % n) + n) % n
 end
 
-function terrain.draw_terrain(terrain_data, cam, width, height)
+function terrain.draw_terrain(terrain_data, cam, width, height, fog_alpha_min)
     local terrain_width = cam.terrain_width or 256
     local terrain_height = cam.terrain_height or 256
     local pitch = cam.pitch or 0
@@ -50,7 +50,7 @@ function terrain.draw_terrain(terrain_data, cam, width, height)
             local g = lerp(0.55, 0.95, t)
             local b = lerp(0.08, 0.22, t)
             local fog = math.min(depth / max_depth, 1)
-            local alpha = lerp(1, 0.55, fog) -- Fog noch schwächer, Terrain bleibt kräftig
+            local alpha = lerp(1, fog_alpha_min or 0.55, fog) -- Fog noch schwächer, Terrain bleibt kräftig
             love.graphics.setColor(r, g, b, alpha)
             if screen_y < max_screen_y then
                 love.graphics.line(screen_x, screen_y, screen_x, max_screen_y)

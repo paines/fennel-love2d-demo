@@ -3,7 +3,15 @@
 (local height 600)
 (local terrain-state {:width 256 :height 256 :data nil})
 (local cam {:x (/ terrain-state.width 2) :y (/ terrain-state.height 2) :z 20 :angle 0 :pitch 0.5})
+
 (local terrainmod (require :terrain))
+;; Terrain-Alpha (Fog) Manipulation
+(var fog-alpha-min 0.55)
+
+;; Panzer-Ladefunktion importieren
+(local {:load-tank load-tank} (require :load_tank))
+;; Panzer-Modell laden (z.B. beim Start)
+(load-tank "PanzerIV/PanzerIV/PanzerIV_Body.fbx")
 
 ;; Rekursive Hilfsfunktion für Terrain-Rendering (jetzt mit var!)
 (var depth-loop
@@ -50,8 +58,9 @@
           (tset (. arr x) y h))))
     {:data arr :width w :height h}))
 
+
 (fn draw-terrain []
-  (terrainmod.draw_terrain terrain-state.data cam width height))
+  (terrainmod.draw_terrain terrain-state.data cam width height fog-alpha-min))
 
 (fn draw []
   (love.graphics.setBackgroundColor 0.55 0.75 1.0 1)
@@ -75,6 +84,7 @@
   (love.window.setMode width height)
   (love.window.setTitle "Voxel Terrain Demo")
   (love.mouse.setRelativeMode false))
+
 
 (fn update [dt]
   (let [speed (* 60 dt)
@@ -105,6 +115,11 @@
       (tset cam :z (math.max 1 (- cam.z z-speed))))
     (when (love.keyboard.isDown "e")
       (tset cam :z (math.min 500 (+ cam.z z-speed))))
+    ;; Fog-Alpha mit U/I steuern
+    (when (love.keyboard.isDown "u")
+      (tset _G :fog-alpha-min (math.max 0.1 (- fog-alpha-min 0.01))))
+    (when (love.keyboard.isDown "i")
+      (tset _G :fog-alpha-min (math.min 1 (+ fog-alpha-min 0.01))))
     ;; Begrenzungen nach allen Bewegungen
     (tset cam :pitch (math.max -1 (math.min 1 cam.pitch)))
     (tset cam :x (math.fmod cam.x terrain-width))

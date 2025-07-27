@@ -1,1 +1,6 @@
 https://github.com/incompl/voxel-heightmap-terrain/blob/master/heightmap.png
+
+https://isolatedsoulstudio.itch.io/lowpoly-tank-pack-01/download/eyJpZCI6NTE0NDY3LCJleHBpcmVzIjoxNzUzNjE4NzAyfQ%3d%3d.%2bYnDPHGQU1DE44OWqnOkcbs8vg4%3d
+
+local openfbx = require("openfbx")
+local result = openfbx.load("deinmodell.fbx")

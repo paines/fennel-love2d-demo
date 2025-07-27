@@ -1,3 +1,5 @@
+local fennel = require("fennel")
+fennel.install()
 local Camera = {x = 0, y = 0, w = 400, h = 300}
 local Player = {x = 200, y = 150, speed = 120}
 local World = {w = 1000, h = 800}

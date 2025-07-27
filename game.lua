@@ -3,8 +3,12 @@ local height = 600
 local terrain_state = {width = 256, height = 256, data = nil}
 local cam = {x = (terrain_state.width / 2), y = (terrain_state.height / 2), z = 20, angle = 0, pitch = 0.5}
 local terrainmod = require("terrain")
+local fog_alpha_min = 0.55
+local _local_1_ = require("load_tank")
+local load_tank = _local_1_["load-tank"]
+load_tank("PanzerIV/PanzerIV/PanzerIV_Body.fbx")
 local depth_loop
-local function _1_(terrain, terrain_width, terrain_height, screen_x, angle, depth, max_screen_y)
+local function _2_(terrain, terrain_width, terrain_height, screen_x, angle, depth, max_screen_y)
   if (depth <= 200) then
     local dx = (math.cos(angle) * depth)
     local dy = (math.sin(angle) * depth)
@@ -37,7 +41,7 @@ local function _1_(terrain, terrain_width, terrain_height, screen_x, angle, dept
     return nil
   end
 end
-depth_loop = _1_
+depth_loop = _2_
 local function generate_heightmap(w, h)
   local arr = {}
   local freq = 0.045
@@ -61,7 +65,7 @@ local function generate_heightmap(w, h)
   return {data = arr, width = w, height = h}
 end
 local function draw_terrain()
-  return terrainmod.draw_terrain(terrain_state.data, cam, width, height)
+  return terrainmod.draw_terrain(terrain_state.data, cam, width, height, fog_alpha_min)
 end
 local function draw()
   love.graphics.setBackgroundColor(0.55, 0.75, 1.0, 1)
@@ -127,6 +131,14 @@ local function update(dt)
   end
   if love.keyboard.isDown("e") then
     cam["z"] = math.min(500, (cam.z + z_speed))
+  else
+  end
+  if love.keyboard.isDown("u") then
+    _G["fog-alpha-min"] = math.max(0.1, (fog_alpha_min - 0.01))
+  else
+  end
+  if love.keyboard.isDown("i") then
+    _G["fog-alpha-min"] = math.min(1, (fog_alpha_min + 0.01))
   else
   end
   cam["pitch"] = math.max(-1, math.min(1, cam.pitch))

@@ -1,3 +1,6 @@
+(local fennel (require :fennel))
+(fennel.install)
+
 (local Camera
   {:x 0 :y 0 :w 400 :h 300})
 
