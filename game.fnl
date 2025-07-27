@@ -31,17 +31,24 @@
               (depth-loop terrain terrain-width terrain-height screen-x angle (+ depth 1) max-screen-y)))
           (depth-loop terrain terrain-width terrain-height screen-x angle (+ depth 1) max-screen-y))))))
 
-(fn load-heightmap [filename]
-  (let [img (love.image.newImageData filename)
-        imgw (img:getWidth)
-        imgh (img:getHeight)
-        arr {}]
-    (for [x 0 (- imgw 1)]
+(fn generate-heightmap [w h]
+  (let [arr {}
+        freq 0.045 ; noch längere Wellen
+        amp 18      ; noch kleinere Amplitude
+        base-h 155]
+    (for [x 0 (- w 1)]
       (tset arr x {})
-      (for [y 0 (- imgh 1)]
-        (let [r (select 1 (img:getPixel x y))]
-          (tset (. arr x) y (* r 255))))) ; Höhe von 0-255
-    {:data arr :width imgw :height imgh}))
+      (for [y 0 (- h 1)]
+        ;; Basis: Flachere Sinuswellen
+        (let [base (+ (* (math.sin (* x freq)) amp)
+                      (* (math.cos (* y freq)) amp))
+              ;; Nur ein großer Peak, kleiner und weiter außen
+              peak1 (let [dx (- x 180) dy (- y 180)]
+                      (math.max 0 (- 30 (math.sqrt (+ (* dx dx) (* dy dy))))))
+              noise (* (math.random) 2)
+              h (math.max 0 (math.min 255 (+ base-h base peak1 noise)))]
+          (tset (. arr x) y h))))
+    {:data arr :width w :height h}))
 
 (fn draw-terrain []
   (terrainmod.draw_terrain terrain-state.data cam width height))
@@ -52,7 +59,7 @@
   (draw-terrain))
 
 (fn load []
-  (let [tstate (load-heightmap "heightmap.png")
+  (let [tstate (generate-heightmap 256 256)
         mid-x (/ tstate.width 2)
         mid-y (/ tstate.height 2)]
     (tset terrain-state :data tstate.data)
@@ -60,7 +67,7 @@
     (tset terrain-state :height tstate.height)
     (tset cam :x mid-x)
     (tset cam :y mid-y)
-    (tset cam :z 180) ; höhere Start-Höhe, damit man nicht im Terrain startet
+    (tset cam :z 180)
     (tset cam :pitch -0.45)
     (tset cam :terrain_width tstate.width)
     (tset cam :terrain_height tstate.height))

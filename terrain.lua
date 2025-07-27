@@ -20,7 +20,7 @@ function terrain.draw_terrain(terrain_data, cam, width, height)
     local scale = 110 -- scale reduziert
     for screen_x = 0, width - 1 do
         local angle = cam.angle + (screen_x - width / 2) * 0.005
-        local max_depth = 120
+        local max_depth = 220 -- increased viewing distance
         local max_screen_y = height
         local function depth_loop(depth, max_screen_y)
             if depth > max_depth then return end
@@ -36,7 +36,7 @@ function terrain.draw_terrain(terrain_data, cam, width, height)
             local g = lerp(0.6, 0.6, t)
             local b = lerp(0.1, 0.6, t)
             local fog = math.min(depth / max_depth, 1)
-            local alpha = lerp(1, 0.15, fog)
+            local alpha = lerp(1, 0.10, fog) -- fog a bit denser in the far distance
             love.graphics.setColor(r, g, b, alpha)
             if screen_y < max_screen_y then
                 love.graphics.line(screen_x, screen_y, screen_x, max_screen_y)

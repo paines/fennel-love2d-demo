@@ -38,19 +38,27 @@ local function _1_(terrain, terrain_width, terrain_height, screen_x, angle, dept
   end
 end
 depth_loop = _1_
-local function load_heightmap(filename)
-  local img = love.image.newImageData(filename)
-  local imgw = img:getWidth()
-  local imgh = img:getHeight()
+local function generate_heightmap(w, h)
   local arr = {}
-  for x = 0, (imgw - 1) do
+  local freq = 0.045
+  local amp = 18
+  local base_h = 155
+  for x = 0, (w - 1) do
     arr[x] = {}
-    for y = 0, (imgh - 1) do
-      local r = select(1, img:getPixel(x, y))
-      do end (arr[x])[y] = (r * 255)
+    for y = 0, (h - 1) do
+      local base = ((math.sin((x * freq)) * amp) + (math.cos((y * freq)) * amp))
+      local peak1
+      do
+        local dx = (x - 180)
+        local dy = (y - 180)
+        peak1 = math.max(0, (30 - math.sqrt(((dx * dx) + (dy * dy)))))
+      end
+      local noise = (math.random() * 2)
+      local h0 = math.max(0, math.min(255, (base_h + base + peak1 + noise)))
+      do end (arr[x])[y] = h0
     end
   end
-  return {data = arr, width = imgw, height = imgh}
+  return {data = arr, width = w, height = h}
 end
 local function draw_terrain()
   return terrainmod.draw_terrain(terrain_state.data, cam, width, height)
@@ -62,7 +70,7 @@ local function draw()
 end
 local function load()
   do
-    local tstate = load_heightmap("heightmap.png")
+    local tstate = generate_heightmap(256, 256)
     local mid_x = (tstate.width / 2)
     local mid_y = (tstate.height / 2)
     do end (terrain_state)["data"] = tstate.data
