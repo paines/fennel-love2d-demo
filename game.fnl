@@ -47,20 +47,6 @@
   (terrainmod.draw_terrain terrain-state.data cam width height))
 
 (fn draw []
-  ;; Test: Zeichne ein weißes Rechteck oben links
-  (love.graphics.setColor 1 1 1 1)
-  (love.graphics.rectangle "fill" 10 10 30 30)
-  ;; Debug: Terrain-Status anzeigen
-  (love.graphics.setColor 1 1 0 1)
-  (love.graphics.print (.. "Terrain: " (tostring terrain-state.data)) 50 10)
-  (let [first-x 0
-        first-y 0
-        first-row (. terrain-state.data first-x)
-        first-val (and first-row (. first-row first-y))]
-    (love.graphics.print (.. "T[0][0]: " (tostring first-val)) 50 30)
-    (when (and first-val (> first-val 0))
-      (love.graphics.setColor 1 0 0 1)
-      (love.graphics.line 100 100 200 100)))
   (draw-terrain))
 
 (fn load []

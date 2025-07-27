@@ -56,22 +56,6 @@ local function draw_terrain()
   return terrainmod.draw_terrain(terrain_state.data, cam, width, height)
 end
 local function draw()
-  love.graphics.setColor(1, 1, 1, 1)
-  love.graphics.rectangle("fill", 10, 10, 30, 30)
-  love.graphics.setColor(1, 1, 0, 1)
-  love.graphics.print(("Terrain: " .. tostring(terrain_state.data)), 50, 10)
-  do
-    local first_x = 0
-    local first_y = 0
-    local first_row = terrain_state.data[first_x]
-    local first_val = (first_row and first_row[first_y])
-    love.graphics.print(("T[0][0]: " .. tostring(first_val)), 50, 30)
-    if (first_val and (first_val > 0)) then
-      love.graphics.setColor(1, 0, 0, 1)
-      love.graphics.line(100, 100, 200, 100)
-    else
-    end
-  end
   return draw_terrain()
 end
 local function load()
