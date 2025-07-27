@@ -96,7 +96,12 @@
     (when (love.keyboard.isDown "q")
       (tset cam :z (math.max 1 (- cam.z z-speed))))
     (when (love.keyboard.isDown "e")
-      (tset cam :z (math.min 255 (+ cam.z z-speed))))))
+      (tset cam :z (math.min 500 (+ cam.z z-speed))))
+    ;; Begrenzungen nach allen Bewegungen
+    (tset cam :pitch (math.max -1 (math.min 1 cam.pitch)))
+    (tset cam :x (math.fmod cam.x terrain-width))
+    (tset cam :y (math.fmod cam.y terrain-height))
+    (tset cam :z (math.max 1 (math.min 500 cam.z)))))
 
 (fn mousemoved [x y dx dy istouch]
   (when (love.keyboard.isDown "lshift")

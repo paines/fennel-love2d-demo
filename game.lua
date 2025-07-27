@@ -117,11 +117,14 @@ local function update(dt)
   else
   end
   if love.keyboard.isDown("e") then
-    cam["z"] = math.min(255, (cam.z + z_speed))
-    return nil
+    cam["z"] = math.min(500, (cam.z + z_speed))
   else
-    return nil
   end
+  cam["pitch"] = math.max(-1, math.min(1, cam.pitch))
+  do end (cam)["x"] = math.fmod(cam.x, terrain_width)
+  do end (cam)["y"] = math.fmod(cam.y, terrain_height)
+  do end (cam)["z"] = math.max(1, math.min(500, cam.z))
+  return nil
 end
 local function mousemoved(x, y, dx, dy, istouch)
   if love.keyboard.isDown("lshift") then
