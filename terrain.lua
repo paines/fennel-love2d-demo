@@ -46,11 +46,11 @@ function terrain.draw_terrain(terrain_data, cam, width, height)
             -- screen_y-Berechnung optimiert: cam_z stärker gewichtet, Pitch-Einfluss auf Horizont
             local screen_y = math.floor(horizon - ((h - cam_z) / (depth * 0.9)) * scale)
             local t = math.min(math.max(h / 255, 0), 1)
-            local r = lerp(0.1, 0.6, t)
-            local g = lerp(0.6, 0.6, t)
-            local b = lerp(0.1, 0.6, t)
+            local r = lerp(0.09, 0.22, t)
+            local g = lerp(0.55, 0.95, t)
+            local b = lerp(0.08, 0.22, t)
             local fog = math.min(depth / max_depth, 1)
-            local alpha = lerp(1, 0.10, fog) -- fog a bit denser in the far distance
+            local alpha = lerp(1, 0.55, fog) -- Fog noch schwächer, Terrain bleibt kräftig
             love.graphics.setColor(r, g, b, alpha)
             if screen_y < max_screen_y then
                 love.graphics.line(screen_x, screen_y, screen_x, max_screen_y)
