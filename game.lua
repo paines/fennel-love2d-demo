@@ -56,6 +56,8 @@ local function draw_terrain()
   return terrainmod.draw_terrain(terrain_state.data, cam, width, height)
 end
 local function draw()
+  love.graphics.setColor(1, 1, 1, 1)
+  love.graphics.print(("Pitch: " .. tostring(cam.pitch)), 10, 10)
   return draw_terrain()
 end
 local function load()
@@ -66,10 +68,54 @@ local function load()
     terrain_state["height"] = tstate.height
     cam["x"] = (terrain_state.width / 2)
     do end (cam)["y"] = (terrain_state.height / 2)
+    do end (cam)["pitch"] = 0
   end
   love.window.setMode(width, height)
-  return love.window.setTitle("Voxel Terrain Demo")
+  love.window.setTitle("Voxel Terrain Demo")
+  return love.mouse.setRelativeMode(false)
 end
 local function update(dt)
+  local speed = (60 * dt)
+  local turn_speed = (1.5 * dt)
+  local pitch_speed = (0.8 * dt)
+  if love.keyboard.isDown("a") then
+    cam["angle"] = (cam.angle - turn_speed)
+  else
+  end
+  if love.keyboard.isDown("d") then
+    cam["angle"] = (cam.angle + turn_speed)
+  else
+  end
+  if love.keyboard.isDown("w") then
+    cam["x"] = (cam.x + (math.cos(cam.angle) * speed))
+    do end (cam)["y"] = (cam.y + (math.sin(cam.angle) * speed))
+  else
+  end
+  if love.keyboard.isDown("s") then
+    cam["x"] = (cam.x - (math.cos(cam.angle) * speed))
+    do end (cam)["y"] = (cam.y - (math.sin(cam.angle) * speed))
+  else
+  end
+  if love.keyboard.isDown("up") then
+    cam["pitch"] = math.max(-1, (cam.pitch - pitch_speed))
+  else
+  end
+  if love.keyboard.isDown("down") then
+    cam["pitch"] = math.min(1, (cam.pitch + pitch_speed))
+    return nil
+  else
+    return nil
+  end
 end
-return {update = update, draw = draw, load = load}
+local function mousemoved(x, y, dx, dy, istouch)
+  if love.keyboard.isDown("lshift") then
+    cam["pitch"] = math.max(-1, math.min(1, (cam.pitch + (dy * 0.01))))
+    return nil
+  else
+    return nil
+  end
+end
+local function keypressed(key, scancode, isrepeat)
+  return print("KEYPRESSED!", key)
+end
+return {update = update, draw = draw, load = load, mousemoved = mousemoved, keypressed = keypressed}

@@ -34,5 +34,19 @@ end
 love.load = function()
   return game.load()
 end
+love.keypressed = function(key, scancode, isrepeat)
+  if game.keypressed then
+    return game.keypressed(key, scancode, isrepeat)
+  else
+    return nil
+  end
+end
+love.mousemoved = function(x, y, dx, dy, istouch)
+  if game.mousemoved then
+    return game.mousemoved(x, y, dx, dy, istouch)
+  else
+    return nil
+  end
+end
 lurker.path = "."
 return nil

@@ -47,6 +47,8 @@
   (terrainmod.draw_terrain terrain-state.data cam width height))
 
 (fn draw []
+  (love.graphics.setColor 1 1 1 1)
+  (love.graphics.print (.. "Pitch: " (tostring cam.pitch)) 10 10)
   (draw-terrain))
 
 (fn load []
@@ -55,12 +57,39 @@
     (tset terrain-state :width tstate.width)
     (tset terrain-state :height tstate.height)
     (tset cam :x (/ terrain-state.width 2))
-    (tset cam :y (/ terrain-state.height 2)))
+    (tset cam :y (/ terrain-state.height 2))
+    (tset cam :pitch 0))
   (love.window.setMode width height)
-  (love.window.setTitle "Voxel Terrain Demo"))
+  (love.window.setTitle "Voxel Terrain Demo")
+  (love.mouse.setRelativeMode false))
 
 (fn update [dt]
-  ;; Helikopter/Kamera-Steuerung (z.B. mit Tasten)
-  )
+  (let [speed (* 60 dt)
+        turn-speed (* 1.5 dt)
+        pitch-speed (* 0.8 dt)]
+    (when (love.keyboard.isDown "a")
+      (tset cam :angle (- cam.angle turn-speed)))
+    (when (love.keyboard.isDown "d")
+      (tset cam :angle (+ cam.angle turn-speed)))
+    (when (love.keyboard.isDown "w")
+      (do
+        (tset cam :x (+ cam.x (* (math.cos cam.angle) speed)))
+        (tset cam :y (+ cam.y (* (math.sin cam.angle) speed)))))
+    (when (love.keyboard.isDown "s")
+      (do
+        (tset cam :x (- cam.x (* (math.cos cam.angle) speed)))
+        (tset cam :y (- cam.y (* (math.sin cam.angle) speed)))))
+    ;; Pitch mit Pfeiltasten steuern
+    (when (love.keyboard.isDown "up")
+      (tset cam :pitch (math.max -1 (- cam.pitch pitch-speed))))
+    (when (love.keyboard.isDown "down")
+      (tset cam :pitch (math.min 1 (+ cam.pitch pitch-speed))))))
 
-{:update update :draw draw :load load}
+(fn mousemoved [x y dx dy istouch]
+  (when (love.keyboard.isDown "lshift")
+    (tset cam :pitch (math.max -1 (math.min 1 (+ cam.pitch (* dy 0.01)))))))
+
+(fn keypressed [key scancode isrepeat]
+  (print "KEYPRESSED!" key))
+
+{:update update :draw draw :load load :mousemoved mousemoved :keypressed keypressed}

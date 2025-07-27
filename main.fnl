@@ -36,4 +36,10 @@
 (fn love.load []
   (game.load))
 
+(fn love.keypressed [key scancode isrepeat]
+  (when game.keypressed (game.keypressed key scancode isrepeat)))
+
+(fn love.mousemoved [x y dx dy istouch]
+  (when game.mousemoved (game.mousemoved x y dx dy istouch)))
+
 (set lurker.path ".")
