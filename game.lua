@@ -64,6 +64,7 @@ local function draw_terrain()
   return terrainmod.draw_terrain(terrain_state.data, cam, width, height)
 end
 local function draw()
+  love.graphics.setBackgroundColor(0.55, 0.75, 1.0, 1)
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.print(("Pitch: " .. tostring(cam.pitch) .. "  H\195\182he: " .. tostring(cam.z)), 10, 10)
   return draw_terrain()

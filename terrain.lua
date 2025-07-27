@@ -18,6 +18,20 @@ function terrain.draw_terrain(terrain_data, cam, width, height)
     local cam_z = cam.z or 10
     local horizon = height / 2 + (pitch * 180) -- Pitch-Einfluss auf Horizont erhöht
     local scale = 110 -- scale reduziert
+    -- Sky background
+    love.graphics.setColor(0.55, 0.75, 1.0, 1)
+    love.graphics.rectangle("fill", 0, 0, width, horizon)
+    -- Simple moving clouds
+    local time = love.timer.getTime()
+    for i=1,8 do
+        local cx = ((i * 60 + time * 20 * (0.5 + i * 0.07)) % width)
+        local cy = horizon * (0.18 + 0.18 * math.sin(i + time * 0.2 + i))
+        local cr = 32 + 12 * math.sin(i * 1.7 + time * 0.5)
+        love.graphics.setColor(1,1,1,0.22)
+        love.graphics.ellipse("fill", cx, cy, cr, cr * 0.45)
+        love.graphics.setColor(1,1,1,0.13)
+        love.graphics.ellipse("fill", cx+cr*0.5, cy+cr*0.1, cr*0.7, cr*0.3)
+    end
     for screen_x = 0, width - 1 do
         local angle = cam.angle + (screen_x - width / 2) * 0.005
         local max_depth = 220 -- increased viewing distance

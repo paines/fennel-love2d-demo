@@ -54,6 +54,7 @@
   (terrainmod.draw_terrain terrain-state.data cam width height))
 
 (fn draw []
+  (love.graphics.setBackgroundColor 0.55 0.75 1.0 1)
   (love.graphics.setColor 1 1 1 1)
   (love.graphics.print (.. "Pitch: " (tostring cam.pitch) "  Höhe: " (tostring cam.z)) 10 10)
   (draw-terrain))
