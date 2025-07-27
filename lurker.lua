@@ -21,18 +21,18 @@ local function get_native_files(path)
 end
 
 function lurker.scan()
-  print("[Lurker] Absoluter Pfad:", love.filesystem.getWorkingDirectory() .. "/" .. lurker.path)
+  -- print("[Lurker] Absoluter Pfad:", love.filesystem.getWorkingDirectory() .. "/" .. lurker.path)
   local changed = false
   local items = get_native_files(lurker.path)
-  print("[Lurker] Dateien im Verzeichnis:", #items)
+  -- print("[Lurker] Dateien im Verzeichnis:", #items)
   for _, file in ipairs(items) do
-    print("[Lurker] Datei gefunden:", file)
+    -- print("[Lurker] Datei gefunden:", file)
     if file:match("%.lua$") then
       local modtime = get_modtime(file)
       if modtime and (not lurker.last[file] or lurker.last[file] ~= modtime) then
         lurker.last[file] = modtime
         changed = true
-        print("Lurker erkennt Änderung an:", file)
+        -- print("Lurker erkennt Änderung an:", file)
       end
     end
   end

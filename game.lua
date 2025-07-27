@@ -1,7 +1,43 @@
-local width = 400
-local height = 300
+local width = 800
+local height = 600
 local terrain_state = {width = 256, height = 256, data = nil}
-local cam = {x = 128, y = 64, z = 40, angle = 0}
+local cam = {x = (terrain_state.width / 2), y = (terrain_state.height / 2), z = 20, angle = 0, pitch = 0.5}
+local terrainmod = require("terrain")
+local depth_loop
+local function _1_(terrain, terrain_width, terrain_height, screen_x, angle, depth, max_screen_y)
+  if (depth <= 200) then
+    local dx = (math.cos(angle) * depth)
+    local dy = (math.sin(angle) * depth)
+    local map_x = math.floor((cam.x + dx))
+    local map_y = math.floor((cam.y + dy))
+    if ((map_x >= 0) and (map_x < terrain_width) and (map_y >= 0) and (map_y < terrain_height)) then
+      local h = terrain[map_x][map_y]
+      local screen_y = math.floor((height - (0.7 * h)))
+      if ((screen_x == 200) and (depth <= 10)) then
+        love.graphics.setColor(1, 1, 0, 1)
+        love.graphics.print(("d=" .. depth .. ", mx=" .. map_x .. ", my=" .. map_y .. ", h=" .. h .. ", y=" .. screen_y), 250, (10 + (depth * 12)))
+      else
+      end
+      if ((screen_x == 200) and (h == 100)) then
+        love.graphics.setColor(1, 0, 1, 1)
+        love.graphics.line(screen_x, 100, screen_x, 120)
+      else
+      end
+      if (screen_y < max_screen_y) then
+        love.graphics.setColor(0, 1, 0, 1)
+        love.graphics.line(screen_x, screen_y, screen_x, max_screen_y)
+        return __fnl_global__depth_2dloop(terrain, terrain_width, terrain_height, screen_x, angle, (depth + 1), screen_y)
+      else
+        return __fnl_global__depth_2dloop(terrain, terrain_width, terrain_height, screen_x, angle, (depth + 1), max_screen_y)
+      end
+    else
+      return __fnl_global__depth_2dloop(terrain, terrain_width, terrain_height, screen_x, angle, (depth + 1), max_screen_y)
+    end
+  else
+    return nil
+  end
+end
+depth_loop = _1_
 local function load_heightmap(filename)
   local img = love.image.newImageData(filename)
   local imgw = img:getWidth()
@@ -17,33 +53,25 @@ local function load_heightmap(filename)
   return {data = arr, width = imgw, height = imgh}
 end
 local function draw_terrain()
-  local terrain = terrain_state.data
-  local terrain_width = terrain_state.width
-  local terrain_height = terrain_state.height
-  for screen_x = 0, (width - 1) do
-    local angle = (cam.angle + ((screen_x - (width / 2)) * 0.005))
-    local max_screen_y = height
-    for depth = 1, 200 do
-      local dx = (math.cos(angle) * depth)
-      local dy = (math.sin(angle) * depth)
-      local map_x = math.floor((cam.x + dx))
-      local map_y = math.floor((cam.y + dy))
-      if ((map_x >= 0) and (map_x < terrain_width) and (map_y >= 0) and (map_y < terrain_height)) then
-        local h = terrain[map_x][map_y]
-        local screen_y = math.floor((cam.z - (0.5 * h) - (100 / depth)))
-        if (screen_y < max_screen_y) then
-          love.graphics.setColor(0.2, 0.8, 0.2, (1.0 * (1 - (depth / 200))))
-          love.graphics.line(screen_x, screen_y, screen_x, max_screen_y)
-          __fnl_global__set_21(max_screen_y, screen_y)
-        else
-        end
-      else
-      end
-    end
-  end
-  return nil
+  return terrainmod.draw_terrain(terrain_state.data, cam, width, height)
 end
 local function draw()
+  love.graphics.setColor(1, 1, 1, 1)
+  love.graphics.rectangle("fill", 10, 10, 30, 30)
+  love.graphics.setColor(1, 1, 0, 1)
+  love.graphics.print(("Terrain: " .. tostring(terrain_state.data)), 50, 10)
+  do
+    local first_x = 0
+    local first_y = 0
+    local first_row = terrain_state.data[first_x]
+    local first_val = (first_row and first_row[first_y])
+    love.graphics.print(("T[0][0]: " .. tostring(first_val)), 50, 30)
+    if (first_val and (first_val > 0)) then
+      love.graphics.setColor(1, 0, 0, 1)
+      love.graphics.line(100, 100, 200, 100)
+    else
+    end
+  end
   return draw_terrain()
 end
 local function load()
@@ -52,6 +80,8 @@ local function load()
     do end (terrain_state)["data"] = tstate.data
     terrain_state["width"] = tstate.width
     terrain_state["height"] = tstate.height
+    cam["x"] = (terrain_state.width / 2)
+    do end (cam)["y"] = (terrain_state.height / 2)
   end
   love.window.setMode(width, height)
   return love.window.setTitle("Voxel Terrain Demo")
