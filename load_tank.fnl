@@ -1,14 +1,15 @@
 ;; load_tank.fnl
-
-;; Beispiel: 3D-Modell eines Panzers mit openfbx laden
 (local openfbx (require :openfbx))
 
+(print "openfbx require: " openfbx (type openfbx))
+
 (fn load-tank [pfad]
-  (let [result (openfbx.load pfad)]
-    (if result
-      (do
-        (print "FBX geladen! Status: " (. result :status))
-        result)
-      (print "Fehler beim Laden des FBX!"))))
+  (print "Vor openfbx.load")
+  (print "openfbx.load: " openfbx.load (type openfbx.load))
+  (let [[result err] (openfbx.load pfad)]
+    (print "Nach openfbx.load")
+    (print "RESULT-TYPE: " (type result) "TOSTRING: " (tostring result))
+    (print "ERR-TYPE: " (type err) "TOSTRING: " (tostring err))
+    result))
 
 {:load-tank load-tank}

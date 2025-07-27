@@ -6,7 +6,7 @@ local terrainmod = require("terrain")
 local fog_alpha_min = 0.55
 local _local_1_ = require("load_tank")
 local load_tank = _local_1_["load-tank"]
-load_tank("PanzerIV/PanzerIV/PanzerIV_Body.fbx")
+local tank_mesh = nil
 local depth_loop
 local function _2_(terrain, terrain_width, terrain_height, screen_x, angle, depth, max_screen_y)
   if (depth <= 200) then
@@ -71,9 +71,19 @@ local function draw()
   love.graphics.setBackgroundColor(0.55, 0.75, 1.0, 1)
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.print(("Pitch: " .. tostring(cam.pitch) .. "  H\195\182he: " .. tostring(cam.z)), 10, 10)
-  return draw_terrain()
+  draw_terrain()
+  if (type(tank_mesh) == "table") then
+    love.graphics.setColor(1, 0, 0, 1)
+    return love.graphics.print("Tank geladen!", 10, 30)
+  else
+    return nil
+  end
 end
 local function load()
+  do
+    local result = load_tank("PanzerIV/PanzerIV/PanzerIV_Body.fbx")
+    print("GAME.FNL: result type: ", type(result), " tostring: ", tostring(result))
+  end
   do
     local tstate = generate_heightmap(256, 256)
     local mid_x = (tstate.width / 2)

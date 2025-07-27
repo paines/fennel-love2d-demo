@@ -11,7 +11,8 @@
 ;; Panzer-Ladefunktion importieren
 (local {:load-tank load-tank} (require :load_tank))
 ;; Panzer-Modell laden (z.B. beim Start)
-(load-tank "PanzerIV/PanzerIV/PanzerIV_Body.fbx")
+(var tank-mesh nil)
+
 
 ;; Rekursive Hilfsfunktion für Terrain-Rendering (jetzt mit var!)
 (var depth-loop
@@ -66,12 +67,21 @@
   (love.graphics.setBackgroundColor 0.55 0.75 1.0 1)
   (love.graphics.setColor 1 1 1 1)
   (love.graphics.print (.. "Pitch: " (tostring cam.pitch) "  Höhe: " (tostring cam.z)) 10 10)
-  (draw-terrain))
+  (draw-terrain)
+  ;; Beispiel: Zugriff auf tank-mesh nur wenn vorhanden und korrekt
+  (when (= (type tank-mesh) "table")
+    (love.graphics.setColor 1 0 0 1)
+    (love.graphics.print "Tank geladen!" 10 30)))
 
 (fn load []
+
+  (let [result (load-tank "PanzerIV/PanzerIV/PanzerIV_Body.fbx")]
+      (print "GAME.FNL: result type: " (type result) " tostring: " (tostring result)))
+  
   (let [tstate (generate-heightmap 256 256)
         mid-x (/ tstate.width 2)
         mid-y (/ tstate.height 2)]
+
     (tset terrain-state :data tstate.data)
     (tset terrain-state :width tstate.width)
     (tset terrain-state :height tstate.height)
