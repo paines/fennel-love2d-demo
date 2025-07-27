@@ -48,17 +48,22 @@
 
 (fn draw []
   (love.graphics.setColor 1 1 1 1)
-  (love.graphics.print (.. "Pitch: " (tostring cam.pitch)) 10 10)
+  (love.graphics.print (.. "Pitch: " (tostring cam.pitch) "  Höhe: " (tostring cam.z)) 10 10)
   (draw-terrain))
 
 (fn load []
-  (let [tstate (load-heightmap "heightmap.png")]
+  (let [tstate (load-heightmap "heightmap.png")
+        mid-x (/ tstate.width 2)
+        mid-y (/ tstate.height 2)]
     (tset terrain-state :data tstate.data)
     (tset terrain-state :width tstate.width)
     (tset terrain-state :height tstate.height)
-    (tset cam :x (/ terrain-state.width 2))
-    (tset cam :y (/ terrain-state.height 2))
-    (tset cam :pitch 0))
+    (tset cam :x mid-x)
+    (tset cam :y mid-y)
+    (tset cam :z 180) ; höhere Start-Höhe, damit man nicht im Terrain startet
+    (tset cam :pitch -0.45)
+    (tset cam :terrain_width tstate.width)
+    (tset cam :terrain_height tstate.height))
   (love.window.setMode width height)
   (love.window.setTitle "Voxel Terrain Demo")
   (love.mouse.setRelativeMode false))
@@ -66,24 +71,32 @@
 (fn update [dt]
   (let [speed (* 60 dt)
         turn-speed (* 1.5 dt)
-        pitch-speed (* 0.8 dt)]
+        pitch-speed (* 0.8 dt)
+        z-speed (* 20 dt)
+        terrain-width terrain-state.width
+        terrain-height terrain-state.height]
     (when (love.keyboard.isDown "a")
       (tset cam :angle (- cam.angle turn-speed)))
     (when (love.keyboard.isDown "d")
       (tset cam :angle (+ cam.angle turn-speed)))
     (when (love.keyboard.isDown "w")
       (do
-        (tset cam :x (+ cam.x (* (math.cos cam.angle) speed)))
-        (tset cam :y (+ cam.y (* (math.sin cam.angle) speed)))))
+        (tset cam :x (math.fmod (+ cam.x (* (math.cos cam.angle) speed)) terrain-width))
+        (tset cam :y (math.fmod (+ cam.y (* (math.sin cam.angle) speed)) terrain-height))))
     (when (love.keyboard.isDown "s")
       (do
-        (tset cam :x (- cam.x (* (math.cos cam.angle) speed)))
-        (tset cam :y (- cam.y (* (math.sin cam.angle) speed)))))
+        (tset cam :x (math.fmod (- cam.x (* (math.cos cam.angle) speed)) terrain-width))
+        (tset cam :y (math.fmod (- cam.y (* (math.sin cam.angle) speed)) terrain-height))))
     ;; Pitch mit Pfeiltasten steuern
     (when (love.keyboard.isDown "up")
       (tset cam :pitch (math.max -1 (- cam.pitch pitch-speed))))
     (when (love.keyboard.isDown "down")
-      (tset cam :pitch (math.min 1 (+ cam.pitch pitch-speed))))))
+      (tset cam :pitch (math.min 1 (+ cam.pitch pitch-speed))))
+    ;; Höhe mit Q/E steuern
+    (when (love.keyboard.isDown "q")
+      (tset cam :z (math.max 1 (- cam.z z-speed))))
+    (when (love.keyboard.isDown "e")
+      (tset cam :z (math.min 255 (+ cam.z z-speed))))))
 
 (fn mousemoved [x y dx dy istouch]
   (when (love.keyboard.isDown "lshift")

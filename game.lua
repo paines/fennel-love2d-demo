@@ -57,18 +57,23 @@ local function draw_terrain()
 end
 local function draw()
   love.graphics.setColor(1, 1, 1, 1)
-  love.graphics.print(("Pitch: " .. tostring(cam.pitch)), 10, 10)
+  love.graphics.print(("Pitch: " .. tostring(cam.pitch) .. "  H\195\182he: " .. tostring(cam.z)), 10, 10)
   return draw_terrain()
 end
 local function load()
   do
     local tstate = load_heightmap("heightmap.png")
+    local mid_x = (tstate.width / 2)
+    local mid_y = (tstate.height / 2)
     do end (terrain_state)["data"] = tstate.data
     terrain_state["width"] = tstate.width
     terrain_state["height"] = tstate.height
-    cam["x"] = (terrain_state.width / 2)
-    do end (cam)["y"] = (terrain_state.height / 2)
-    do end (cam)["pitch"] = 0
+    cam["x"] = mid_x
+    cam["y"] = mid_y
+    cam["z"] = 180
+    cam["pitch"] = -0.45
+    cam["terrain_width"] = tstate.width
+    cam["terrain_height"] = tstate.height
   end
   love.window.setMode(width, height)
   love.window.setTitle("Voxel Terrain Demo")
@@ -78,6 +83,9 @@ local function update(dt)
   local speed = (60 * dt)
   local turn_speed = (1.5 * dt)
   local pitch_speed = (0.8 * dt)
+  local z_speed = (20 * dt)
+  local terrain_width = terrain_state.width
+  local terrain_height = terrain_state.height
   if love.keyboard.isDown("a") then
     cam["angle"] = (cam.angle - turn_speed)
   else
@@ -87,13 +95,13 @@ local function update(dt)
   else
   end
   if love.keyboard.isDown("w") then
-    cam["x"] = (cam.x + (math.cos(cam.angle) * speed))
-    do end (cam)["y"] = (cam.y + (math.sin(cam.angle) * speed))
+    cam["x"] = math.fmod((cam.x + (math.cos(cam.angle) * speed)), terrain_width)
+    do end (cam)["y"] = math.fmod((cam.y + (math.sin(cam.angle) * speed)), terrain_height)
   else
   end
   if love.keyboard.isDown("s") then
-    cam["x"] = (cam.x - (math.cos(cam.angle) * speed))
-    do end (cam)["y"] = (cam.y - (math.sin(cam.angle) * speed))
+    cam["x"] = math.fmod((cam.x - (math.cos(cam.angle) * speed)), terrain_width)
+    do end (cam)["y"] = math.fmod((cam.y - (math.sin(cam.angle) * speed)), terrain_height)
   else
   end
   if love.keyboard.isDown("up") then
@@ -102,6 +110,14 @@ local function update(dt)
   end
   if love.keyboard.isDown("down") then
     cam["pitch"] = math.min(1, (cam.pitch + pitch_speed))
+  else
+  end
+  if love.keyboard.isDown("q") then
+    cam["z"] = math.max(1, (cam.z - z_speed))
+  else
+  end
+  if love.keyboard.isDown("e") then
+    cam["z"] = math.min(255, (cam.z + z_speed))
     return nil
   else
     return nil
