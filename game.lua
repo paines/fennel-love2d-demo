@@ -72,9 +72,68 @@ local function draw()
   love.graphics.setColor(1, 1, 1, 1)
   love.graphics.print(("Pitch: " .. tostring(cam.pitch) .. "  H\195\182he: " .. tostring(cam.z)), 10, 10)
   draw_terrain()
-  if (type(tank_mesh) == "table") then
+  if (tank_mesh and (type(tank_mesh) == "table") and tank_mesh.meshes and (type(tank_mesh.meshes) == "table") and (#tank_mesh.meshes > 0)) then
     love.graphics.setColor(1, 0, 0, 1)
-    return love.graphics.print("Tank geladen!", 10, 30)
+    love.graphics.print("Tank geladen! (Wireframe)", 10, 30)
+    local tank_x = (terrain_state.width / 2)
+    local tank_y = (terrain_state.height / 2)
+    local tank_z = 0
+    local project
+    local function _8_(vx, vy, vz)
+      local scale = 32
+      local wx = (vx - tank_x)
+      local wy = (vy - tank_y)
+      local wz = (vz - tank_z)
+      local cx = cam.x
+      local cy = cam.y
+      local cz = cam.z
+      local pitch = cam.pitch
+      local angle = cam.angle
+      local dx = (wx - (cx - tank_x))
+      local dy = (wy - (cy - tank_y))
+      local dz = (wz - (cz - tank_z))
+      local rx = ((dx * math.cos(angle)) + (dy * math.sin(angle)))
+      local ry = ((dy * math.cos(angle)) - (dx * math.sin(angle)))
+      local rz = dz
+      local py = ((ry * math.cos(pitch)) + (rz * math.sin(pitch)))
+      local pz = ((rz * math.cos(pitch)) - (ry * math.sin(pitch)))
+      local sx = ((width / 2) + (rx * scale))
+      local sy = ((height / 2) + (py * scale))
+      return {sx, sy}
+    end
+    project = _8_
+    for i = 1, #tank_mesh.meshes do
+      local mesh = tank_mesh.meshes[i]
+      local verts = (mesh and (type(mesh) == "table") and mesh.vertices)
+      local inds = (mesh and (type(mesh) == "table") and mesh.indices)
+      if (verts and (type(verts) == "table") and inds and (type(inds) == "table") and (#inds > 2)) then
+        for f = 1, (#inds / 3) do
+          local i1 = (1 + (3 * (f - 1)))
+          local i2 = (i1 + 1)
+          local i3 = (i1 + 2)
+          local idx1 = (inds[i1] or 1)
+          local idx2 = (inds[i2] or 1)
+          local idx3 = (inds[i3] or 1)
+          local v1 = (verts[idx1] or {[{1}] = 0, [{2}] = 0, [{3}] = 0})
+          local v2 = (verts[idx2] or {[{1}] = 0, [{2}] = 0, [{3}] = 0})
+          local v3 = (verts[idx3] or {[{1}] = 0, [{2}] = 0, [{3}] = 0})
+          local _let_9_ = project((v1[1] or 0), (v1[2] or 0), (v1[3] or 0))
+          local x1 = _let_9_[1]
+          local y1 = _let_9_[2]
+          local _let_10_ = project((v2[1] or 0), (v2[2] or 0), (v2[3] or 0))
+          local x2 = _let_10_[1]
+          local y2 = _let_10_[2]
+          local _let_11_ = project((v3[1] or 0), (v3[2] or 0), (v3[3] or 0))
+          local x3 = _let_11_[1]
+          local y3 = _let_11_[2]
+          love.graphics.line(x1, y1, x2, y2)
+          love.graphics.line(x2, y2, x3, y3)
+          love.graphics.line(x3, y3, x1, y1)
+        end
+      else
+      end
+    end
+    return nil
   else
     return nil
   end
@@ -83,6 +142,10 @@ local function load()
   do
     local result = load_tank("PanzerIV/PanzerIV/PanzerIV_Body.fbx")
     print("GAME.FNL: result type: ", type(result), " tostring: ", tostring(result))
+    if (type(result) == "table") then
+      tank_mesh = {meshes = result}
+    else
+    end
   end
   do
     local tstate = generate_heightmap(256, 256)
