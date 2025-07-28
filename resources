@@ -4,3 +4,5 @@ https://isolatedsoulstudio.itch.io/lowpoly-tank-pack-01/download/eyJpZCI6NTE0NDY
 
 local openfbx = require("openfbx")
 local result = openfbx.load("deinmodell.fbx")
+
+https://raw.githubusercontent.com/ufbx/ufbx/refs/heads/master/ufbx.c
