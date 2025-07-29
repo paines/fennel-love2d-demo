@@ -42,12 +42,21 @@
 
 (fn generate-heightmap [w h]
   (let [arr {}
-        flat-height 155] ; Flat terrain height
+        freq 0.045 ; noch längere Wellen
+        amp 18      ; noch kleinere Amplitude
+        base-h 155]
     (for [x 0 (- w 1)]
       (tset arr x {})
       (for [y 0 (- h 1)]
-        ;; Set all terrain to flat height
-        (tset (. arr x) y flat-height)))
+        ;; Basis: Flachere Sinuswellen
+        (let [base (+ (* (math.sin (* x freq)) amp)
+                      (* (math.cos (* y freq)) amp))
+              ;; Nur ein großer Peak, kleiner und weiter außen
+              peak1 (let [dx (- x 180) dy (- y 180)]
+                      (math.max 0 (- 30 (math.sqrt (+ (* dx dx) (* dy dy))))))
+              noise (* (math.random) 2)
+              h (math.max 0 (math.min 255 (+ base-h base peak1 noise)))]
+          (tset (. arr x) y h))))
     {:data arr :width w :height h}))
 
 
